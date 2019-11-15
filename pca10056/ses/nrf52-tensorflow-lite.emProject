@@ -3,7 +3,9 @@
   <project Name="nrf52-tensorflow-lite">
     <configuration
       Name="Common"
+      STLport="Yes with IOStream support"
       arm_architecture="v7EM"
+      arm_compiler_variant="gcc"
       arm_core_type="Cortex-M4"
       arm_endian="Little"
       arm_fp_abi="Hard"
@@ -12,16 +14,26 @@
       arm_linker_process_stack_size="0"
       arm_linker_stack_size="8192"
       arm_linker_treat_warnings_as_errors="No"
+      arm_linker_variant="GNU"
       arm_simulator_memory_simulation_parameter="RWX 00000000,00100000,FFFFFFFF;RWX 20000000,00010000,CDCDCDCD"
       arm_target_device_name="nRF52840_xxAA"
       arm_target_interface_type="SWD"
+      arm_use_builtins="Yes"
+      c_additional_options=""
       c_preprocessor_definitions="BSP_DEFINES_ONLY;CONFIG_GPIO_AS_PINRESET;FLOAT_ABI_HARD;INITIALIZE_USER_SECTIONS;NO_VTOR_CONFIG;NRF52840_XXAA;SWI_DISABLE0"
       c_user_include_directories="$(SDKDir)/components;$(SDKDir)/components/libraries/timer;$(SDKDir)/components/boards;$(SDKDir)/components/drivers_nrf/nrf_soc_nosd;$(SDKDir)/components/libraries/atomic;$(SDKDir)/components/libraries/balloc;$(SDKDir)/components/libraries/bsp;$(SDKDir)/components/libraries/delay;$(SDKDir)/components/libraries/experimental_section_vars;$(SDKDir)/components/libraries/fifo;$(SDKDir)/components/libraries/log;$(SDKDir)/components/libraries/log/src;$(SDKDir)/components/libraries/memobj;$(SDKDir)/components/libraries/ringbuf;$(SDKDir)/components/libraries/strerror;$(SDKDir)/components/libraries/led_softblink;$(SDKDir)/components/libraries/low_power_pwm;$(SDKDir)/components/libraries/util;$(SDKDir)/components/toolchain/cmsis/include;$(SDKDir)/external/fprintf;$(SDKDir)/integration/nrfx;$(SDKDir)/integration/nrfx/legacy;$(SDKDir)/modules/nrfx;$(SDKDir)/modules/nrfx/drivers/include;$(SDKDir)/modules/nrfx/hal;$(SDKDir)/modules/nrfx/mdk;../../../config;../../..;../config"
+      cpp_enable_rtti="Yes"
+      cpp_only_additional_options=""
       debug_register_definition_file="$(SDKDir)/modules/nrfx/mdk/nrf52840.svd"
       debug_start_from_entry_point_symbol="No"
       debug_target_connection="J-Link"
+      debug_type_file="$(StudioDir)/bin/STLport.xml"
+      gcc_c_language_standard="gnu11"
+      gcc_cplusplus_language_standard="gnu++11"
       gcc_debugging_level="Level 3"
       gcc_entry_point="Reset_Handler"
+      link_include_standard_libraries="Yes"
+      link_standard_libraries_directory="$(StudioLibDir:$(StudioDir)/lib)"
       linker_output_format="hex"
       linker_printf_fmt_level="long"
       linker_printf_width_precision_supported="Yes"
@@ -29,60 +41,87 @@
       linker_section_placement_file="flash_placement.xml"
       linker_section_placements_segments="FLASH RX 0x0 0x100000;RAM RWX 0x20000000 0x40000"
       macros="CMSIS_CONFIG_TOOL=$(SDKDir)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
+      project_dependencies=""
       project_directory=""
       project_type="Executable" />
     <folder Name="Segger Startup Files">
-      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+      <file file_name="thumb_crt0.s" />
     </folder>
     <folder Name="nRF_Log">
-      <file file_name="$(SDKDir)/components/libraries/log/src/nrf_log_frontend.c" />
-      <file file_name="$(SDKDir)/components/libraries/log/src/nrf_log_str_formatter.c" />
+      <file file_name="nrf_log_frontend.c" />
+      <file file_name="nrf_log_str_formatter.c" />
     </folder>
     <folder Name="Board Definition">
-      <file file_name="$(SDKDir)/components/boards/boards.c" />
+      <file file_name="boards.c" />
     </folder>
     <folder Name="nRF_Libraries">
-      <file file_name="$(SDKDir)/components/libraries/util/app_error.c" />
-      <file file_name="$(SDKDir)/components/libraries/util/app_error_handler_gcc.c" />
-      <file file_name="$(SDKDir)/components/libraries/util/app_error_weak.c" />
-      <file file_name="$(SDKDir)/components/libraries/timer/app_timer.c" />
-      <file file_name="$(SDKDir)/components/libraries/fifo/app_fifo.c" />
-      <file file_name="$(SDKDir)/components/libraries/util/app_util_platform.c" />
-      <file file_name="$(SDKDir)/components/libraries/util/nrf_assert.c" />
-      <file file_name="$(SDKDir)/components/libraries/atomic/nrf_atomic.c" />
-      <file file_name="$(SDKDir)/components/libraries/balloc/nrf_balloc.c" />
-      <file file_name="$(SDKDir)/components/libraries/led_softblink/led_softblink.c" />
-      <file file_name="$(SDKDir)/components/libraries/low_power_pwm/low_power_pwm.c" />
-      <file file_name="$(SDKDir)/external/fprintf/nrf_fprintf.c" />
-      <file file_name="$(SDKDir)/external/fprintf/nrf_fprintf_format.c" />
-      <file file_name="$(SDKDir)/components/libraries/memobj/nrf_memobj.c" />
-      <file file_name="$(SDKDir)/components/libraries/ringbuf/nrf_ringbuf.c" />
-      <file file_name="$(SDKDir)/components/libraries/strerror/nrf_strerror.c" />
+      <file file_name="app_error.c" />
+      <file file_name="app_error_handler_gcc.c" />
+      <file file_name="app_error_weak.c" />
+      <file file_name="app_timer.c" />
+      <file file_name="app_fifo.c" />
+      <file file_name="app_util_platform.c" />
+      <file file_name="nrf_assert.c" />
+      <file file_name="nrf_atomic.c" />
+      <file file_name="nrf_balloc.c" />
+      <file file_name="led_softblink.c" />
+      <file file_name="low_power_pwm.c" />
+      <file file_name="nrf_fprintf.c" />
+      <file file_name="nrf_fprintf_format.c" />
+      <file file_name="nrf_memobj.c" />
+      <file file_name="nrf_ringbuf.c" />
+      <file file_name="nrf_strerror.c" />
     </folder>
     <folder Name="nRF_Drivers">
-      <file file_name="$(SDKDir)/integration/nrfx/legacy/nrf_drv_clock.c" />
-      <file file_name="$(SDKDir)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c" />
-      <file file_name="$(SDKDir)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c" />
-      <file file_name="$(SDKDir)/modules/nrfx/soc/nrfx_atomic.c" />
-      <file file_name="$(SDKDir)/modules/nrfx/drivers/src/nrfx_clock.c" />
+      <file file_name="nrf_drv_clock.c" />
+      <file file_name="nrf_nvic.c" />
+      <file file_name="nrf_soc.c" />
+      <file file_name="nrfx_atomic.c" />
+      <file file_name="nrfx_clock.c" />
+      <configuration
+        Name="Common"
+        c_user_include_directories=".;$(SDKDir)/modules/nrfx/soc" />
     </folder>
     <folder Name="Application">
-      <file file_name="../config/sdk_config.h" />
-      <file file_name="../../src/main.c" />
+      <file file_name="sdk_config.h" />
       <configuration Name="Debug DK" c_user_include_directories="" />
       <configuration
         Name="Common"
-        c_user_include_directories="$(ProjectDir)/../../inc/" />
+        c_only_additional_options="-Wno-maybe-uninitialized;-Wno-missing-field-initializers;-Wno-pointer-sign;-Wno-type-limits"
+        c_user_include_directories="$(ProjectDir)/../../inc/;$(ProjectDir)/../../lib/tfmicro;$(ProjectDir)/../../lib/tfmicro/third_party/flatbuffers/include;$(ProjectDir)/../../lib/tfmicro/third_party/gemmlowp" />
+      <file file_name="../../src/sine_model_data.cc" />
+      <file file_name="../../src/main.cc" />
     </folder>
     <folder Name="None">
-      <file file_name="$(SDKDir)/modules/nrfx/mdk/ses_startup_nrf52840.s" />
-      <file file_name="$(SDKDir)/modules/nrfx/mdk/ses_startup_nrf_common.s" />
-      <file file_name="$(SDKDir)/modules/nrfx/mdk/system_nrf52840.c" />
+      <file file_name="ses_startup_nrf52840.s" />
+      <file file_name="ses_startup_nrf_common.s" />
+      <file file_name="system_nrf52840.c" />
     </folder>
-    <folder Name="Lib" />
+    <folder Name="Lib">
+      <file file_name="../../lib/tfmicro/tensorflow/lite/core/api/error_reporter.cc" />
+      <configuration
+        Name="Common"
+        c_user_include_directories=".;$(ProjectDir)/../../inc/;$(ProjectDir)/../../lib/tfmicro;$(ProjectDir)/../../lib/tfmicro/third_party/flatbuffers/include" />
+      <file file_name="../../lib/tfmicro/tensorflow/lite/experimental/micro/micro_error_reporter.cc" />
+      <file file_name="../../lib/tfmicro/tensorflow/lite/experimental/micro/debug_log_numbers.cc" />
+      <file file_name="../../lib/tfmicro/tensorflow/lite/experimental/micro/debug_log.cc" />
+      <file file_name="../../lib/tfmicro/tensorflow/lite/experimental/micro/micro_utils.cc" />
+      <file file_name="../../inc/main.h" />
+    </folder>
+    <configuration
+      Name="Debug DK"
+      arm_assembler_variant="gcc"
+      arm_compiler_variant="gcc"
+      c_additional_options=""
+      cpp_only_additional_options=""
+      gcc_c_language_standard="gnu11"
+      gcc_cplusplus_language_standard="gnu++11"
+      link_standard_libraries_directory="$(StudioLibDir:$(StudioDir)/lib)"
+      project_type="Executable" />
   </project>
   <configuration
     Name="DK"
+    c_only_additional_options=""
     c_preprocessor_definitions="BOARD_PCA10056"
     hidden="Yes"
     linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0x0;FLASH_SIZE=0x100000;RAM_START=0x20000000;RAM_SIZE=0x40000" />
@@ -98,6 +137,8 @@
     inherited_configurations="DK" />
   <configuration
     Name="Debug DK"
+    c_additional_options=""
+    c_only_additional_options=""
     c_preprocessor_definitions="DEBUG; DEBUG_NRF"
     gcc_optimization_level="None"
     inherited_configurations="DK" />
@@ -111,4 +152,9 @@
     c_preprocessor_definitions="DEBUG; DEBUG_NRF"
     gcc_optimization_level="None"
     inherited_configurations="Dongle" />
+  <configuration
+    Name="Common"
+    arm_linker_no_warn_on_mismatch="No"
+    c_only_additional_options=""
+    c_preprocessor_definitions="" />
 </solution>

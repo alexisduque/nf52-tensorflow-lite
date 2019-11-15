@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
+ * Copyright (c) 2014 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -37,64 +37,91 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-/** @file
- *
- * @defgroup led_softblink_example_main main.c
- * @{
- * @ingroup led_softblink_example
- * @brief LED Soft Blink Example Application main file.
- *
- */
-
-#include <stdbool.h>
-#include <stdint.h>
-#include "nrf_delay.h"
-#include "nrf_gpio.h"
-#include "boards.h"
-#include "led_softblink.h"
-#include "app_error.h"
-#include "sdk_errors.h"
-#include "app_timer.h"
-#include "nrf_drv_clock.h"
 #include "app_util_platform.h"
-#include "main.h"
-/**
- * @brief Function for starting lfclk needed by APP_TIMER.
- */
-static void lfclk_init(void)
-{
-    uint32_t err_code;
-    err_code = nrf_drv_clock_init();
-    APP_ERROR_CHECK(err_code);
 
-    nrf_drv_clock_lfclk_request(NULL);
+#ifdef SOFTDEVICE_PRESENT
+/* Global nvic state instance, required by nrf_nvic.h */
+nrf_nvic_state_t nrf_nvic_state;
+#endif
+
+static uint32_t m_in_critical_region = 0;
+
+void app_util_disable_irq(void)
+{
+    __disable_irq();
+    m_in_critical_region++;
 }
 
-/**
- * @brief Function for application main entry.
- */
-int main(void)
+void app_util_enable_irq(void)
 {
-    ret_code_t err_code;
-
-    lfclk_init();
-
-    // Start APP_TIMER to generate timeouts.
-    err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
-
-    const led_sb_init_params_t led_sb_init_param = LED_SB_INIT_DEFAULT_PARAMS(LEDS_MASK);
-
-    err_code = led_softblink_init(&led_sb_init_param);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = led_softblink_start(LEDS_MASK);
-    APP_ERROR_CHECK(err_code);
-
-    while (true)
+    m_in_critical_region--;
+    if (m_in_critical_region == 0)
     {
-        __WFE();
+        __enable_irq();
     }
 }
 
-/** @} */
+void app_util_critical_region_enter(uint8_t *p_nested)
+{
+#if __CORTEX_M == (0x04U)
+    ASSERT(APP_LEVEL_PRIVILEGED == privilege_level_get())
+#endif
+
+#if defined(SOFTDEVICE_PRESENT)
+    /* return value can be safely ignored */
+    (void) sd_nvic_critical_region_enter(p_nested);
+#else
+    app_util_disable_irq();
+#endif
+}
+
+void app_util_critical_region_exit(uint8_t nested)
+{
+#if __CORTEX_M == (0x04U)
+    ASSERT(APP_LEVEL_PRIVILEGED == privilege_level_get())
+#endif
+
+#if defined(SOFTDEVICE_PRESENT)
+    /* return value can be safely ignored */
+    (void) sd_nvic_critical_region_exit(nested);
+#else
+    app_util_enable_irq();
+#endif
+}
+
+
+uint8_t privilege_level_get(void)
+{
+#if __CORTEX_M == (0x00U) || defined(_WIN32) || defined(__unix) || defined(__APPLE__)
+    /* the Cortex-M0 has no concept of privilege */
+    return APP_LEVEL_PRIVILEGED;
+#elif __CORTEX_M == (0x04U)
+    uint32_t isr_vector_num = __get_IPSR() & IPSR_ISR_Msk ;
+    if (0 == isr_vector_num)
+    {
+        /* Thread Mode, check nPRIV */
+        int32_t control = __get_CONTROL();
+        return control & CONTROL_nPRIV_Msk ? APP_LEVEL_UNPRIVILEGED : APP_LEVEL_PRIVILEGED;
+    }
+    else
+    {
+        /* Handler Mode, always privileged */
+        return APP_LEVEL_PRIVILEGED;
+    }
+#endif
+}
+
+
+uint8_t current_int_priority_get(void)
+{
+    uint32_t isr_vector_num = __get_IPSR() & IPSR_ISR_Msk ;
+    if (isr_vector_num > 0)
+    {
+        int32_t irq_type = ((int32_t)isr_vector_num - EXTERNAL_INT_VECTOR_OFFSET);
+        return (NVIC_GetPriority((IRQn_Type)irq_type) & 0xFF);
+    }
+    else
+    {
+        return APP_IRQ_PRIORITY_THREAD;
+    }
+}
